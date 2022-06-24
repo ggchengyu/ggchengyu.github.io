@@ -21,25 +21,31 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.12.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Recording what I did">
-<meta property="og:type" content="website">
-<meta property="og:title" content="AGan">
-<meta property="og:url" content="http://example.com/index.html">
+    <meta name="description" content="主线虚拟化技术也是有发展历史的。从历史发展的视角看虚拟化技术，我觉得很有意思。虚拟化概念在计算机领域无处不在，比如：进程、文件系统、虚拟内存等。 在如今，人们遇到一个很有意思的问题：买那么多架构的硬件 __too expensive__，只买一台行不行？——虚拟化                                 买了那么多硬件，空闲太浪费了，能不能面向用户租出去？——云计算（核心是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="virtual-summary">
+<meta property="og:url" content="http://example.com/articles/2022/06/24/virtual-summary/index.html">
 <meta property="og:site_name" content="AGan">
-<meta property="og:description" content="Recording what I did">
+<meta property="og:description" content="主线虚拟化技术也是有发展历史的。从历史发展的视角看虚拟化技术，我觉得很有意思。虚拟化概念在计算机领域无处不在，比如：进程、文件系统、虚拟内存等。 在如今，人们遇到一个很有意思的问题：买那么多架构的硬件 __too expensive__，只买一台行不行？——虚拟化                                 买了那么多硬件，空闲太浪费了，能不能面向用户租出去？——云计算（核心是">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/virtual-summary/vmm.png">
+<meta property="article:published_time" content="2022-06-24T06:45:32.000Z">
+<meta property="article:modified_time" content="2022-06-24T09:50:36.630Z">
 <meta property="article:author" content="Gan Chengyu">
+<meta property="article:tag" content="qemu">
+<meta property="article:tag" content="virtualization">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/virtual-summary/vmm.png">
 
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/articles/2022/06/24/virtual-summary/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"en","comments":"","permalink":"","path":"index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/articles/2022/06/24/virtual-summary/","path":"articles/2022/06/24/virtual-summary/","title":"virtual-summary"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>AGan</title>
+<title>virtual-summary | AGan</title>
   
 
 
@@ -69,7 +75,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">AGan</h1>
+      <p class="site-title">AGan</p>
       <i class="logo-line"></i>
     </a>
   </div>
@@ -101,7 +107,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           Table of Contents
@@ -114,6 +120,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BB%E7%BA%BF"><span class="nav-number">1.</span> <span class="nav-text">主线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8ECPU%E7%9C%8B%E6%8C%87%E4%BB%A4%E5%88%92%E5%88%86"><span class="nav-number">1.1.</span> <span class="nav-text">从CPU看指令划分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8ECPU%E7%9C%8B%E6%8C%87%E4%BB%A4%E5%88%86%E7%BA%A7"><span class="nav-number">1.2.</span> <span class="nav-text">从CPU看指令分级</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -167,16 +174,17 @@
 </noscript>
 
 
-    <div class="main-inner index posts-expand">
+    <div class="main-inner post posts-expand">
 
-    
+
+  
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/articles/2022/06/24/virtual-summary/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -190,13 +198,13 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | AGan">
+      <meta itemprop="name" content="virtual-summary | AGan">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/articles/2022/06/24/virtual-summary/" class="post-title-link" itemprop="url">virtual-summary</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          virtual-summary
+        </h1>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -229,7 +237,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="主线"><a href="#主线" class="headerlink" title="主线"></a>主线</h1><p>虚拟化技术也是有发展历史的。从历史发展的视角看虚拟化技术，我觉得很有意思。<br>虚拟化概念在计算机领域无处不在，比如：进程、文件系统、虚拟内存等。</p>
+        <h1 id="主线"><a href="#主线" class="headerlink" title="主线"></a>主线</h1><p>虚拟化技术也是有发展历史的。从历史发展的视角看虚拟化技术，我觉得很有意思。<br>虚拟化概念在计算机领域无处不在，比如：进程、文件系统、虚拟内存等。</p>
 <p>在如今，人们遇到一个很有意思的问题：买那么多架构的硬件 __too expensive__，只买一台行不行？——虚拟化<br>                                 买了那么多硬件，空闲太浪费了，能不能面向用户租出去？——云计算（核心是虚拟化技术）</p>
 <p>需求和市场契合，人们开始认真研究怎么弄。</p>
 <h2 id="从CPU看指令划分"><a href="#从CPU看指令划分" class="headerlink" title="从CPU看指令划分"></a>从CPU看指令划分</h2><p>（为啥不看操作系统？—— 操作系统又不是轮子，没有CPU怎么跑？）</p>
@@ -243,7 +251,6 @@
 <p>如果我要模拟运行一台新的、不同于硬件架构的计算机，我该运行在哪个等级？</p>
 <p>两种分类方法没有</p>
 
-      
     </div>
 
     
@@ -251,11 +258,34 @@
     
 
     <footer class="post-footer">
-        <div class="post-eof"></div>
-      
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Gan Chengyu
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="http://example.com/articles/2022/06/24/virtual-summary/" title="virtual-summary">http://example.com/articles/2022/06/24/virtual-summary/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/qemu/" rel="tag"># qemu</a>
+              <a href="/tags/virtualization/" rel="tag"># virtualization</a>
+          </div>
+
+        
+
     </footer>
   </article>
 </div>
+
 
 
 
