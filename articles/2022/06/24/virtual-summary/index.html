@@ -29,8 +29,10 @@
 <meta property="og:description" content="主线虚拟化技术也是有发展历史的。从历史发展的视角看虚拟化技术，我觉得很有意思。虚拟化概念在计算机领域无处不在，比如：进程、文件系统、虚拟内存等。 在如今，人们遇到一个很有意思的问题：买那么多架构的硬件 __too expensive__，只买一台行不行？——虚拟化                                 买了那么多硬件，空闲太浪费了，能不能面向用户租出去？——云计算（核心是">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/virtual-summary/vmm.png">
+<meta property="og:image" content="http://example.com/virtual-summary/ParaVirtualization.png">
+<meta property="og:image" content="http://example.com/virtual-summary/root_and_non-root.png">
 <meta property="article:published_time" content="2022-06-24T06:45:32.000Z">
-<meta property="article:modified_time" content="2022-06-24T09:50:36.630Z">
+<meta property="article:modified_time" content="2022-06-27T07:46:29.112Z">
 <meta property="article:author" content="Gan Chengyu">
 <meta property="article:tag" content="qemu">
 <meta property="article:tag" content="virtualization">
@@ -120,7 +122,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BB%E7%BA%BF"><span class="nav-number">1.</span> <span class="nav-text">主线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8ECPU%E7%9C%8B%E6%8C%87%E4%BB%A4%E5%88%92%E5%88%86"><span class="nav-number">1.1.</span> <span class="nav-text">从CPU看指令划分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8ECPU%E7%9C%8B%E6%8C%87%E4%BB%A4%E5%88%86%E7%BA%A7"><span class="nav-number">1.2.</span> <span class="nav-text">从CPU看指令分级</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BB%E7%BA%BF"><span class="nav-number">1.</span> <span class="nav-text">主线</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E5%9B%B0%E5%B1%80"><span class="nav-number">1.1.</span> <span class="nav-text">指令困局</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8ECPU%E7%9C%8B%E6%8C%87%E4%BB%A4%E5%88%86%E7%B1%BB"><span class="nav-number">1.1.1.</span> <span class="nav-text">从CPU看指令分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8ECPU%E7%9C%8B%E6%8C%87%E4%BB%A4%E5%88%86%E7%BA%A7"><span class="nav-number">1.1.2.</span> <span class="nav-text">从CPU看指令分级</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E5%AF%B9%E8%99%9A%E6%8B%9F%E5%8C%96%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">1.1.3.</span> <span class="nav-text">指令对虚拟化的影响</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%8C%96%E6%8A%80%E6%9C%AF%E5%8F%91%E5%B1%95%E4%B8%8ECPU%E6%8C%87%E4%BB%A4"><span class="nav-number">1.2.</span> <span class="nav-text">虚拟化技术发展与CPU指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E7%A1%AC%E4%BB%B6%E8%BE%85%E5%8A%A9%EF%BC%9A%E5%8D%8A%E8%99%9A%E6%8B%9F%E5%8C%96%E3%80%81%E5%85%A8%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="nav-number">1.2.1.</span> <span class="nav-text">无硬件辅助：半虚拟化、全虚拟化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E7%A1%AC%E4%BB%B6%E8%BE%85%E5%8A%A9%EF%BC%9A-%E7%A1%AC%E4%BB%B6%E8%99%9A%E6%8B%9F%E5%8C%96"><span class="nav-number">1.2.2.</span> <span class="nav-text">有硬件辅助： 硬件虚拟化</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -135,7 +137,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">3</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -146,7 +148,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -213,9 +215,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2022-06-24 14:45:32 / Modified: 17:50:36" itemprop="dateCreated datePublished" datetime="2022-06-24T14:45:32+08:00">2022-06-24</time>
+      <time title="Created: 2022-06-24 14:45:32" itemprop="dateCreated datePublished" datetime="2022-06-24T14:45:32+08:00">2022-06-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-06-27 15:46:29" itemprop="dateModified" datetime="2022-06-27T15:46:29+08:00">2022-06-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -240,16 +248,28 @@
         <h1 id="主线"><a href="#主线" class="headerlink" title="主线"></a>主线</h1><p>虚拟化技术也是有发展历史的。从历史发展的视角看虚拟化技术，我觉得很有意思。<br>虚拟化概念在计算机领域无处不在，比如：进程、文件系统、虚拟内存等。</p>
 <p>在如今，人们遇到一个很有意思的问题：买那么多架构的硬件 __too expensive__，只买一台行不行？——虚拟化<br>                                 买了那么多硬件，空闲太浪费了，能不能面向用户租出去？——云计算（核心是虚拟化技术）</p>
 <p>需求和市场契合，人们开始认真研究怎么弄。</p>
-<h2 id="从CPU看指令划分"><a href="#从CPU看指令划分" class="headerlink" title="从CPU看指令划分"></a>从CPU看指令划分</h2><p>（为啥不看操作系统？—— 操作系统又不是轮子，没有CPU怎么跑？）</p>
+<h2 id="指令困局"><a href="#指令困局" class="headerlink" title="指令困局"></a>指令困局</h2><h3 id="从CPU看指令分类"><a href="#从CPU看指令分类" class="headerlink" title="从CPU看指令分类"></a>从CPU看指令分类</h3><p>（为啥不看操作系统？—— 操作系统又不是轮子，没有CPU怎么跑？）</p>
 <p>CPU是一个高度集成的电路板，提供各种逻辑运算，具体的表现是 __指令__。</p>
 <p>从硬件的角度来看，指令被分为敏感指令和非敏感指令。敏感指令与硬件资源相关。</p>
 <p>从使用者的角度来看，指令被分为特权指令和非特权指令。特权指令与系统的关键资源相关。</p>
-<p>__注意__：系统关键资源$\subseteq$硬件资源，因此: 特权指令 + 部分非特权指令 &#x3D; 敏感指令<br><img src="/virtual-summary/vmm.png"></p>
-<h2 id="从CPU看指令分级"><a href="#从CPU看指令分级" class="headerlink" title="从CPU看指令分级"></a>从CPU看指令分级</h2><p>指令划分是为了保护硬件资源。</p>
-<p>在理论上，CPU将指令划分为4个等级，对应ring 0 ~ 3。数字越低，权限越高。操作系统内核，作为管理硬件资源的“大家长”，自然必须有最大的权限ring 0。如果一个ring 3的程序需要行使ring 0的部分功能，必须通过系统调用让“大家长”干完后</p>
-<p>一台设备虽然不可能同时有两个“董事长”，但可以有几个“副董事长”，在董事长的同意下代行权力。</p>
+<p>__注意__：系统关键资源$\subseteq$硬件资源，因此: 特权指令 + 部分非特权指令 &#x3D; 敏感指令</p>
+<p><img src="/virtual-summary/vmm.png"></p>
+<h3 id="从CPU看指令分级"><a href="#从CPU看指令分级" class="headerlink" title="从CPU看指令分级"></a>从CPU看指令分级</h3><p>指令划分是为了保护硬件资源。</p>
+<p>在理论上，CPU将指令划分为4个等级，对应ring 0 ~ 3。数字越低，权限越高。操作系统内核，作为管理硬件资源的“大家长”，自然必须有最大的权限ring 0。如果一个ring 3的程序需要行使ring 0的部分功能，必须通过系统调用让“大家长”干。</p>
+<p>一台设备虽然不可能同时有两个“大家长”，但可以有几个“二当家”，在董事长的同意下代行权力（模块或者驱动作为内核的一部分）。</p>
 <p>如果我要模拟运行一台新的、不同于硬件架构的计算机，我该运行在哪个等级？</p>
-<p>两种分类方法没有</p>
+<h3 id="指令对虚拟化的影响"><a href="#指令对虚拟化的影响" class="headerlink" title="指令对虚拟化的影响"></a>指令对虚拟化的影响</h3><p>由于部分非特权指令可能也是敏感指令，攻击者可以利用这个特点攻击计算机硬件，影响宿主机。</p>
+<p>若特权指令&#x3D;敏感指令，则称呼该指令集系统能够支持虚拟化。（可惜x86没有达到要求 :) ）</p>
+<h2 id="虚拟化技术发展与CPU指令"><a href="#虚拟化技术发展与CPU指令" class="headerlink" title="虚拟化技术发展与CPU指令"></a>虚拟化技术发展与CPU指令</h2><p>虚拟化技术的发展收到CPU指令的影响：。该问题同时引申出管理VM的VMM运行在哪个等级。VMM有模拟或调用硬件资源的功能，因此必须运行在ring 0级，典型的有：KVM。因此，VM只能运行在其他等级，或者借助硬件运行在ring 0级。</p>
+<p>宏观上，将有无硬件辅助来区分虚拟化的技术发展；</p>
+<h3 id="无硬件辅助：半虚拟化、全虚拟化"><a href="#无硬件辅助：半虚拟化、全虚拟化" class="headerlink" title="无硬件辅助：半虚拟化、全虚拟化"></a>无硬件辅助：半虚拟化、全虚拟化</h3><p>半虚拟化和全虚拟化技术，VMM运行在ring 0级。来自Guest OS的敏感指令被VMM截获，可以通过改变指令调用的方式：对VMM的调用（半虚拟化）或动态翻译将特权转成非特权（全虚拟化）</p>
+<p><img src="/virtual-summary/ParaVirtualization.png"></p>
+<p>然而，由于VMM的介入，执行效率有待商榷。</p>
+<h3 id="有硬件辅助：-硬件虚拟化"><a href="#有硬件辅助：-硬件虚拟化" class="headerlink" title="有硬件辅助： 硬件虚拟化"></a>有硬件辅助： 硬件虚拟化</h3><p>目前，硬件虚拟化有两家：Intel VT-x和AMD ，都基于x86架构。</p>
+<p>新的引入：VMX（Virtual Machine Extened)，新的寄存器VMCS，新模式VMX root mode和VMX non-root mdoe。</p>
+<p>为了与指令集分级相匹配，习惯上，VMX non-root被称为ring -1级。这使得VMM上的代码可以和Guest OS代码来回切换执行。具体切换方法为VM entry和VM exit。</p>
+<p><img src="/virtual-summary/root_and_non-root.png"></p>
+<p>本文研究的内容为QEMU-KVM，</p>
 
     </div>
 
@@ -282,6 +302,15 @@
 
         
 
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/articles/2022/06/27/libvmi-patch/" rel="next" title="libvmi_patch">
+                  libvmi_patch <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
     </footer>
   </article>
 </div>

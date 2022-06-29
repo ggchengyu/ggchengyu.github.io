@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.12.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="太多接口了。。我就看看LibVMI用到的。 what is HMP(Human Monitor Interface)HMP是QEMU上的简单交互式监视器，主要用于调试和简单的人类使用。更高级别的工具应该连接到QMP，它提供了与JSON的稳定接口，以便于可靠地解析。 12345678910111213141516171819202122232425262728293031323334353637st">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Interesting expr on LibVMI adapting">
+<meta property="og:url" content="http://example.com/articles/2022/06/28/A%20Interesting%20expr%20on%20LibVMI%20adapting/index.html">
+<meta property="og:site_name" content="AGan">
+<meta property="og:description" content="太多接口了。。我就看看LibVMI用到的。 what is HMP(Human Monitor Interface)HMP是QEMU上的简单交互式监视器，主要用于调试和简单的人类使用。更高级别的工具应该连接到QMP，它提供了与JSON的稳定接口，以便于可靠地解析。 12345678910111213141516171819202122232425262728293031323334353637st">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/libvmi-patch/Schema_syntax.png">
+<meta property="og:image" content="http://example.com/libvmi-patch/JSON_schema_Built-in_Types.png">
+<meta property="article:published_time" content="2022-06-28T03:45:10.000Z">
+<meta property="article:modified_time" content="2022-06-29T09:48:22.460Z">
+<meta property="article:author" content="Gan Chengyu">
+<meta property="article:tag" content="qemu">
+<meta property="article:tag" content="hack">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/libvmi-patch/Schema_syntax.png">
+
+
+<link rel="canonical" href="http://example.com/articles/2022/06/28/A%20Interesting%20expr%20on%20LibVMI%20adapting/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/articles/2022/06/28/A%20Interesting%20expr%20on%20LibVMI%20adapting/","path":"articles/2022/06/28/A Interesting expr on LibVMI adapting/","title":"A Interesting expr on LibVMI adapting"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>A Interesting expr on LibVMI adapting | AGan</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">AGan</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#what-is-HMP-Human-Monitor-Interface"><span class="nav-number">1.</span> <span class="nav-text">what is HMP(Human Monitor Interface)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#QMP"><span class="nav-number">2.</span> <span class="nav-text">QMP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">2.1.</span> <span class="nav-text">introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#response"><span class="nav-number">2.2.</span> <span class="nav-text">response</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#success"><span class="nav-number">2.2.1.</span> <span class="nav-text">success</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#error"><span class="nav-number">2.2.2.</span> <span class="nav-text">error</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Asynchronous-events"><span class="nav-number">2.3.</span> <span class="nav-text">Asynchronous events</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Capabilities-Negotiation"><span class="nav-number">2.4.</span> <span class="nav-text">Capabilities Negotiation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ponder"><span class="nav-number">2.5.</span> <span class="nav-text">Ponder</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#QAPI"><span class="nav-number">3.</span> <span class="nav-text">QAPI</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#The-QAPI-schema-language"><span class="nav-number">3.1.</span> <span class="nav-text">The QAPI schema language</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Extension%EF%BC%9AEBNF"><span class="nav-number">3.2.</span> <span class="nav-text">Extension：EBNF</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#A-simple-example"><span class="nav-number">3.2.1.</span> <span class="nav-text">A simple example</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8E%E7%BB%AD"><span class="nav-number">3.2.2.</span> <span class="nav-text">后续</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9E%E5%88%B0Schema-syntax"><span class="nav-number">3.3.</span> <span class="nav-text">回到Schema syntax</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Built-in-Types"><span class="nav-number">3.4.</span> <span class="nav-text">Built-in Types</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Gan Chengyu"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Gan Chengyu</p>
+  <div class="site-description" itemprop="description">Recording what I did</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/articles/2022/06/28/A%20Interesting%20expr%20on%20LibVMI%20adapting/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Gan Chengyu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="AGan">
+      <meta itemprop="description" content="Recording what I did">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="A Interesting expr on LibVMI adapting | AGan">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          A Interesting expr on LibVMI adapting
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2022-06-28 11:45:10" itemprop="dateCreated datePublished" datetime="2022-06-28T11:45:10+08:00">2022-06-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-06-29 17:48:22" itemprop="dateModified" datetime="2022-06-29T17:48:22+08:00">2022-06-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/virtualization/" itemprop="url" rel="index"><span itemprop="name">virtualization</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>太多接口了。。我就看看LibVMI用到的。</p>
+<h1 id="what-is-HMP-Human-Monitor-Interface"><a href="#what-is-HMP-Human-Monitor-Interface" class="headerlink" title="what is HMP(Human Monitor Interface)"></a>what is HMP(Human Monitor Interface)</h1><p>HMP是QEMU上的简单交互式监视器，主要用于调试和简单的人类使用。更高级别的工具应该连接到QMP，它提供了与JSON的稳定接口，以便于可靠地解析。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">uint64_t</span> <span class="title function_">connection_read_memory</span> <span class="params">(<span class="type">uint64_t</span> user_paddr, <span class="type">void</span> *buf, <span class="type">uint64_t</span> user_len)</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">uint64_t</span> <span class="title function_">connection_write_memory</span> <span class="params">(<span class="type">uint64_t</span> user_paddr, <span class="type">void</span> *buf, <span class="type">uint64_t</span> user_len)</span>;</span><br><span class="line">将一个物理地址（VM）映射到主机的虚拟地址，然后完成读写操作（将user_paddr拷贝进（出）user_paddr所在的内存）</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">send_success_ack</span> <span class="params">(<span class="type">int</span> connection_fd)</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">send_fail_ack</span> <span class="params">(<span class="type">int</span> connection_fd)</span>;</span><br><span class="line">发送成功（失败）？信息到connection_fd</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">request</span> &#123;</span></span><br><span class="line">    <span class="type">uint64_t</span> type;      <span class="comment">// 0 quit, 1 read, 2 write, ... rest reserved</span></span><br><span class="line">    <span class="type">uint64_t</span> address;  <span class="comment">// address to read from OR write to</span></span><br><span class="line">    <span class="type">uint64_t</span> length;   <span class="comment">// number of bytes to read OR write</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">connection_handler</span> <span class="params">(<span class="type">int</span> connection_fd)</span>;</span><br><span class="line">connection_handler采用poll机制，（可能）收到来自LibVMI的指示，读（写）VM的paddr。</span><br><span class="line">判断理由：connection_fd被放到pollfd中参与到事件循环。</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pmemaccess_args</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> socket_fd;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_un</span> *<span class="title">address</span>;</span></span><br><span class="line">    <span class="type">socklen_t</span> address_length;</span><br><span class="line">    <span class="type">char</span> *path; ?</span><br><span class="line">    Error **errp;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> *<span class="title function_">memory_access_thread</span> <span class="params">(<span class="type">void</span> *p)</span></span><br><span class="line">从监听socket_fd接收外来连接，套接字信息保存在address中，然后调用connection_handler。</span><br><span class="line">AF_UNIX用于在同一台机器上进程之间的通信。</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">qmp_pmemaccess</span> <span class="params">(<span class="type">const</span> <span class="type">char</span> *path, Error **errp)</span></span><br><span class="line">建立PF_UNIX的TCP套接字,将address地址域设为AF_UNIX，然后在pmemaccess_args-&gt;socket_fd监听外部连接。</span><br><span class="line">随后开启线程（memory_access_thread），屏蔽所有信号</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hmp_pmemaccess</span><span class="params">(Monitor *mon, <span class="type">const</span> QDict *qdict)</span></span><br><span class="line">path? hmp? qapi?</span><br><span class="line"></span><br><span class="line">qapi-schema.json</span><br><span class="line">qapi/libvmi.json</span><br></pre></td></tr></table></figure>
+
+<p>看起来，LibVMI的qemu-kvm-patch利用了QEMU的HMP（基于QAPI和QMP），通过进程间通信实现：LibVMI发号施令，经HMP传递命令（经进程间通信），让QEMU执行，再由HMP传递反馈。在QEMU中，进程间通信基于PF_UNIX，开启一个线程监听LibVMI的连接请求，利用poll机制处理连接。</p>
+<h1 id="QMP"><a href="#QMP" class="headerlink" title="QMP"></a>QMP</h1><p>QMP是一个基于JSON格式的文本交互模块，用于更改QEMU内部系统状态。</p>
+<h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>Format:<br>{ “execute”: json-string, “arguments”: json-object, “id”: json-value }<br>or<br>{ “exec-oob”: json-string, “arguments”: json-object, “id”: json-value }</p>
+<p>OOB — refer to tcp urgent mode. The packets including URG flags are meant to include OOB(out-of-band) data. Then the peer will recv and solve these packets right away. In other words, cut in line :) .</p>
+<p>the “id” is coupled with OOB, identifing the command.</p>
+<p>To ensure commands to be executed out-of-band get read and executed,<br>the client should have at most eight in-band commands in flight. — from docs&#x2F;interop&#x2F;qmp-spec.txt:139</p>
+<h2 id="response"><a href="#response" class="headerlink" title="response"></a>response</h2><p>two response: success and error</p>
+<h3 id="success"><a href="#success" class="headerlink" title="success"></a>success</h3><p>Format:<br>{ “return” : json-value, “id”: json-value }</p>
+<h3 id="error"><a href="#error" class="headerlink" title="error"></a>error</h3><p>Format:<br>{ “error”: { “class”: json-string, “desc”: json-string }, “id”: json-value }<br>                Error class         Error description</p>
+<h2 id="Asynchronous-events"><a href="#Asynchronous-events" class="headerlink" title="Asynchronous events"></a>Asynchronous events</h2><p>Refer to state changes.<br>Format:<br>{ “event”: json-string, “data”: json-object,<br>  “timestamp”: { “seconds”: json-number, “microseconds”: json-number } }</p>
+<h2 id="Capabilities-Negotiation"><a href="#Capabilities-Negotiation" class="headerlink" title="Capabilities Negotiation"></a>Capabilities Negotiation</h2><p>When connection estabilish, the server is in this mode. Only qmp_capabilities is availiable (even asynchronous events are forbidden)</p>
+<p>You can type like this:<br>{“execute”:”qmp_capabilities”,”arguments”:{“enable”:[“oob”]}}</p>
+<h2 id="Ponder"><a href="#Ponder" class="headerlink" title="Ponder"></a>Ponder</h2><p>QMP应该起到解释作用，底层的原理是什么？</p>
+<h1 id="QAPI"><a href="#QAPI" class="headerlink" title="QAPI"></a>QAPI</h1><p>QAPI是用于提供QEMU内外管理的一组C API，将C API映射到 Client JSON Protocol(QAPI schema?)，支持QMP和QGA。</p>
+<h2 id="The-QAPI-schema-language"><a href="#The-QAPI-schema-language" class="headerlink" title="The QAPI schema language"></a>The QAPI schema language</h2><p>From: &#x2F;docs&#x2F;devel&#x2F;qapi-code-gen.txt<br>Someone generates C code from <strong>QAPI schema</strong> — QAPI schema language.</p>
+<p>QAPI schema: defines the Client JSON Protocol’s commands and events, as well as <strong>types</strong> used by them.<br>type?:<br>simple types (a number of built-in types, such as <code>int</code> and <code>str</code>; as well as enumerations), arrays, complex types (structs and two flavors of unions), and alternate types (a choice between other types).</p>
+<h2 id="Extension：EBNF"><a href="#Extension：EBNF" class="headerlink" title="Extension：EBNF"></a>Extension：EBNF</h2><p>Why write this? EBNF描述语言的语法，在未来rust学习的过程中，可以将一些特性用EBNF描述，加深记忆。（做学术我觉得也很有意思）。前面都是屁话，我喜欢用符号化语言描述一些东西，show me the code, talk is cheap.</p>
+<p>History:<br>Ok, Backus aimed at descripting programming language. Standard: simple, precise, and powerful enough. Peter Naur did donate to it. So BNF(Backus-Naur From) is proposed. EBNF(Extended BNF) is to describe more compact descriptions.</p>
+<p>Every rule three elements:<br>    LeftHandSide ⇐ RightHandSide<br>    Name EBNF rule          Describe the name<br>    italicized word(possibly with underscores)      </p>
+<p>RHS can include names, characters, and combinations of four control forms: sequence, choice(|), option([]), and repetition({}). ⇐ also included.<br>Every character that stands for itself is put into a box. 打字打不出来。。。<br>Any other non-italicized characters that appear in a RHS stand for themselves.</p>
+<h3 id="A-simple-example"><a href="#A-simple-example" class="headerlink" title="A simple example"></a>A simple example</h3><p>Describe integrers.<br>Attention: italicized. See at the markdown view.</p>
+<p><em>digit</em> $\Leftarrow$ 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9</p>
+<p><em>integer</em> $\Leftarrow$ [+|-]<em>digit</em>{<em>digit</em>}</p>
+<p>怎么越看越像编译原理。。。</p>
+<h3 id="后续"><a href="#后续" class="headerlink" title="后续"></a>后续</h3><p>生成树都来了（Derivation Tree）<br>原来不是，相当于初中水平的匹配。。。<br>讲的太啰嗦了，就不多记录了。</p>
+<p>终端符号：only occur in RightHandSide<br>非终端符号：LeftHandSide</p>
+<table>
+<thead>
+<tr>
+<th align="center">symbol</th>
+<th align="center">meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">*</td>
+<td align="center">repetition</td>
+</tr>
+<tr>
+<td align="center">-</td>
+<td align="center">except</td>
+</tr>
+<tr>
+<td align="center">,</td>
+<td align="center">concatenate</td>
+</tr>
+<tr>
+<td align="center">|</td>
+<td align="center">definition</td>
+</tr>
+<tr>
+<td align="center">&#x3D;</td>
+<td align="center">defining</td>
+</tr>
+<tr>
+<td align="center">;</td>
+<td align="center">terminator</td>
+</tr>
+<tr>
+<td align="center">.</td>
+<td align="center">terminator</td>
+</tr>
+</tbody></table>
+<h2 id="回到Schema-syntax"><a href="#回到Schema-syntax" class="headerlink" title="回到Schema syntax"></a>回到Schema syntax</h2><p>based on JSON schema. and ENBF-like notation.<br>JSON-object: var obj1 &#x3D; {};<br>JSON-schema: {}</p>
+<p><img src="/libvmi-patch/Schema_syntax.png"></p>
+<p>A QAPI schema:<br>    SCHEMA &#x3D; TOP-LEVEL-EXPR…<br>    TOP-LEVEL-EXPR &#x3D; DIRECTIVE | DEFINITION<br>    DIRECTIVE &#x3D; INCLUDE | PRAGAM<br>    DEFINITION &#x3D; ENUM | STRUCT | UNION | ALTERNATE | COMMAND | EVENT</p>
+<h2 id="Built-in-Types"><a href="#Built-in-Types" class="headerlink" title="Built-in Types"></a>Built-in Types</h2><p><img src="/libvmi-patch/JSON_schema_Built-in_Types.png"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>Post author:  </strong>Gan Chengyu
+  </li>
+  <li class="post-copyright-link">
+      <strong>Post link: </strong>
+      <a href="http://example.com/articles/2022/06/28/A%20Interesting%20expr%20on%20LibVMI%20adapting/" title="A Interesting expr on LibVMI adapting">http://example.com/articles/2022/06/28/A Interesting expr on LibVMI adapting/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/qemu/" rel="tag"># qemu</a>
+              <a href="/tags/hack/" rel="tag"># hack</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/articles/2022/06/27/libvmi-patch/" rel="prev" title="libvmi_patch">
+                  <i class="fa fa-chevron-left"></i> libvmi_patch
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Gan Chengyu</span>
+</div>
+
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
