@@ -2,8 +2,7 @@
 title: deep-in-libvmi
 date: 2022-07-11 17:08:59
 tags:
-- libvmi
-- qemu
+- qemu-patch
 categories:
 - virtualization
 Description:
@@ -75,7 +74,6 @@ status_t vmi_init(
         goto error_exit;
     }
     ...
-    
     
     if (init_flags & VMI_INIT_DOMAINWATCH) {
         if ( VMI_FAILURE == driver_domainwatch_init(_vmi, init_flags) ) {
